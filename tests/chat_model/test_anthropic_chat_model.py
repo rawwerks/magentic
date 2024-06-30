@@ -8,7 +8,11 @@ from magentic.function_call import (
     ParallelFunctionCall,
 )
 from magentic.streaming import AsyncStreamedStr, StreamedStr
+from magentic.vision import UserImageMessage
 
+@pytest.fixture()
+def image_bytes_jpg() -> bytes:
+    return Path("tests/data/python-powered.jpg").read_bytes()
 
 @pytest.mark.parametrize(
     ("prompt", "output_types", "expected_output_type"),
@@ -62,6 +66,24 @@ def test_anthropic_chat_model_complete_no_structured_output_error():
         output_types=[int, bool],
     )
     assert isinstance(message.content, int | bool)
+
+
+@pytest.mark.anthropic
+def test_anthropic_chat_model_complete_with_image(image_bytes_jpg):
+    chat_model = AnthropicChatModel("claude-3-haiku-20240307")
+    message = chat_model.complete(
+        messages=[
+            UserMessage("Describe this image."),
+            UserImageMessage(image_bytes_jpg)
+        ],
+        output_types=[str]
+    )
+    assert isinstance(message.content, str)
+            UserImageMessage(image_bytes_jpg)
+        ],
+        output_types=[str]
+    )
+    assert isinstance(message.content, str)
 
 
 @pytest.mark.anthropic

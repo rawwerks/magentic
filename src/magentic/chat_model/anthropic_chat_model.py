@@ -14,6 +14,8 @@ from magentic.chat_model.base import (
     avalidate_str_content,
     validate_str_content,
 )
+from magentic.vision import UserImageMessage
+)
 from magentic.chat_model.function_schema import (
     AsyncFunctionSchema,
     BaseFunctionSchema,
@@ -70,6 +72,26 @@ def message_to_anthropic_message(message: Message[Any]) -> MessageParam:
     """Convert a Message to an OpenAI message."""
     # TODO: Add instructions for registering new Message type to this error message
     raise NotImplementedError(type(message))
+
+
+@message_to_anthropic_message.register(UserImageMessage)
+def _(
+    message: UserImageMessage[bytes] | UserImageMessage[str],
+) -> MessageParam:
+    if isinstance(message.content, bytes):
+        mime_type = filetype.guess_mime(message.content)
+        base64_image = base64.b64encode(message.content).decode("utf-8")
+        url = f"data:{mime_type};base64,{base64_image}"
+    elif isinstance(message.content, str):
+        url = message.content
+    else:
+        msg = f"Invalid content type: {type(message.content)}"
+        raise TypeError(msg)
+
+    return {
+        "role": AnthropicMessageRole.USER.value,
+        "content": [{"type": "image", "source": {"type": "url", "url": url}}],
+    }
 
 
 @message_to_anthropic_message.register
