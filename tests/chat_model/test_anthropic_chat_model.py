@@ -79,6 +79,11 @@ def test_anthropic_chat_model_complete_with_image(image_bytes_jpg):
         output_types=[str]
     )
     assert isinstance(message.content, str)
+            UserImageMessage(image_bytes_jpg)
+        ],
+        output_types=[str]
+    )
+    assert isinstance(message.content, str)
 
 
 @pytest.mark.anthropic
