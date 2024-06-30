@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from magentic import FunctionResultMessage
 from magentic.chat_model.base import (
     ChatModel,
+from magentic.vision import UserImageMessage
     StructuredOutputError,
     avalidate_str_content,
     validate_str_content,

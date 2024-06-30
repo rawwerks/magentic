@@ -9,6 +9,7 @@ from magentic.chat_model.openai_chat_model import (
     OpenaiMessageRole,
     message_to_openai_message,
 )
+from magentic.chat_model.anthropic_chat_model import message_to_anthropic_message
 
 T = TypeVar("T", bytes, str)
 ImageContentT = TypeVar("ImageContentT")
