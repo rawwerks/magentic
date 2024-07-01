@@ -77,6 +77,38 @@ def _(message: UserMessage) -> MessageParam:
     return {"role": AnthropicMessageRole.USER.value, "content": message.content}
 
 
+@message_to_anthropic_message.register(UserImageMessage)
+def _(message: UserImageMessage[bytes] | UserImageMessage[str]) -> MessageParam:
+    if isinstance(message.content, bytes):
+        mime_type = filetype.guess_mime(message.content)
+        base64_image = base64.b64encode(message.content).decode("utf-8")
+        image_content = {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": mime_type,
+                "data": base64_image,
+            },
+        }
+    elif isinstance(message.content, str):
+        image_content = {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "unknown",
+                "data": message.content,
+            },
+        }
+    else:
+        msg = f"Invalid content type: {type(message.content)}"
+        raise TypeError(msg)
+
+    return {
+        "role": AnthropicMessageRole.USER.value,
+        "content": [image_content],
+    }
+
+
 @message_to_anthropic_message.register(AssistantMessage)
 def _(message: AssistantMessage[Any]) -> MessageParam:
     if isinstance(message.content, str):

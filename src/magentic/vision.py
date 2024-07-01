@@ -8,6 +8,9 @@ from magentic.chat_model.message import Message, Placeholder
 from magentic.chat_model.openai_chat_model import (
     OpenaiMessageRole,
     message_to_openai_message,
+    message_to_anthropic_message,
+    AnthropicMessageRole,
+    message_to_openai_message,
 )
 
 T = TypeVar("T", bytes, str)
@@ -50,6 +53,6 @@ def _(
         raise TypeError(msg)
 
     return {
-        "role": OpenaiMessageRole.USER.value,
+        "role": AnthropicMessageRole.USER.value,
         "content": [{"type": "image_url", "image_url": {"url": url, "detail": "auto"}}],
     }
