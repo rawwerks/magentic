@@ -82,16 +82,30 @@ def _(message: UserImageMessage[bytes] | UserImageMessage[str]) -> MessageParam:
     if isinstance(message.content, bytes):
         mime_type = filetype.guess_mime(message.content)
         base64_image = base64.b64encode(message.content).decode("utf-8")
-        url = f"data:{mime_type};base64,{base64_image}"
+        image_content = {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": mime_type,
+                "data": base64_image,
+            },
+        }
     elif isinstance(message.content, str):
-        url = message.content
+        image_content = {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "unknown",
+                "data": message.content,
+            },
+        }
     else:
         msg = f"Invalid content type: {type(message.content)}"
         raise TypeError(msg)
 
     return {
         "role": AnthropicMessageRole.USER.value,
-        "content": [{"type": "image_url", "image_url": {"url": url, "detail": "auto"}}],
+        "content": [image_content],
     }
 
 
